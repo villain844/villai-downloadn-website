@@ -68,18 +68,12 @@
       result.innerHTML = "Memproses...";
 
       try {
-        const response = await fetch(`https://tiktok-video-no-watermark2.p.rapidapi.com/?url=${encodeURIComponent(url)}`, {
-          method: 'GET',
-          headers: {
-            'X-RapidAPI-Key': '59ac0efd07mshb08c46b47c831e9p1b39b3jsn8b709962d3b0',
-            'X-RapidAPI-Host': 'tiktok-video-no-watermark2.p.rapidapi.com'
-          }
-        });
-
+        const response = await fetch(`https://tikmate.app/api/lookup?url=${encodeURIComponent(url)}`);
         const data = await response.json();
 
-        if (data?.data?.play) {
-          result.innerHTML = `<p>Link Video:</p><a href="${data.data.play}" target="_blank">${data.data.play}</a>`;
+        if (data?.token && data?.id) {
+          const videoUrl = `https://tikmate.app/download/${data.token}/${data.id}.mp4`;
+          result.innerHTML = `<p>Link Video:</p><a href="${videoUrl}" target="_blank">${videoUrl}</a>`;
         } else {
           result.innerHTML = "Gagal mendapatkan link video.";
         }
