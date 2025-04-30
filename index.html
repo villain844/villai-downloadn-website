@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>𓆩villain host𓆪 Download</title>
   <style>
     body {
@@ -11,14 +11,12 @@
       text-align: center;
       padding: 50px;
     }
-
     h1 {
       font-size: 28px;
       text-shadow: 0 0 10px red, 0 0 20px red;
       margin-bottom: 40px;
     }
-
-    input[type="text"], select {
+    input, select {
       width: 80%;
       padding: 12px;
       border-radius: 10px;
@@ -28,7 +26,6 @@
       box-shadow: 0 0 8px red;
       margin-bottom: 20px;
     }
-
     .btn {
       padding: 12px 30px;
       background: black;
@@ -39,16 +36,13 @@
       cursor: pointer;
       box-shadow: 0 0 15px red;
     }
-
     .btn:hover {
       background: red;
       color: black;
     }
-
     #result {
       margin-top: 30px;
     }
-
     a {
       color: #ff4444;
     }
@@ -63,41 +57,32 @@
     <option value="mp3">Download MP3 (Audio)</option>
   </select>
   <br>
-  <button class="btn" onclick="resolveAndDownload()">DOWNLOAD</button>
+  <button class="btn" onclick="getDownload()">DOWNLOAD</button>
   <div id="result"></div>
 
   <script>
-    async function resolveAndDownload() {
-      const inputUrl = document.getElementById('url').value;
+    async function getDownload() {
+      const url = document.getElementById('url').value;
       const format = document.getElementById('format').value;
       const result = document.getElementById('result');
-      result.innerHTML = "Mengekstrak link...";
+      result.innerHTML = 'Memproses...';
 
       try {
-        // Step 1: Resolve short TikTok URL
-        const res = await fetch(inputUrl, { method: 'HEAD', redirect: 'follow' });
-        const fullUrl = res.url;
+        const res = await fetch(`/api/tiktok?url=${encodeURIComponent(url)}`);
+        const data = await res.json();
 
-        // Step 2: Call TiklyDown API
-        result.innerHTML = "Mengambil video...";
-        const apiRes = await fetch(`https://api.tiklydown.me/download?url=${encodeURIComponent(fullUrl)}`);
-        const data = await apiRes.json();
-
-        if (!data || !data.video) {
-          result.innerHTML = "Gagal mendapatkan data video.";
+        if (data.error) {
+          result.innerHTML = 'Gagal mengambil data video.';
           return;
         }
 
-        if (format === "mp4" && data.video.no_watermark) {
-          result.innerHTML = `<p>Video:</p><a href="${data.video.no_watermark}" target="_blank">Download MP4 (Tanpa Watermark)</a>`;
-        } else if (format === "mp3" && data.music && data.music.play_url) {
-          result.innerHTML = `<p>Audio:</p><a href="${data.music.play_url}" target="_blank">Download MP3</a>`;
+        if (format === 'mp4') {
+          result.innerHTML = `<p>Video:</p><a href="${data.video}" target="_blank">Download MP4</a>`;
         } else {
-          result.innerHTML = "Format tidak tersedia untuk video ini.";
+          result.innerHTML = `<p>Audio:</p><a href="${data.audio}" target="_blank">Download MP3</a>`;
         }
-
-      } catch (error) {
-        result.innerHTML = "Terjadi kesalahan saat mengambil data.";
+      } catch (err) {
+        result.innerHTML = 'Terjadi kesalahan saat mengambil data.';
       }
     }
   </script>
