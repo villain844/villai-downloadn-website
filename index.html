@@ -2,80 +2,90 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>TikTok Downloader - No Watermark</title>
+  <title>𓆩villain host𓆪 Download</title>
   <style>
     body {
-      background-color: #0f0f0f;
+      background-color: #000;
       color: #fff;
-      font-family: Arial, sans-serif;
+      font-family: 'Courier New', monospace;
       text-align: center;
-      padding: 40px;
+      padding: 50px;
     }
-    input, button {
-      padding: 12px;
-      font-size: 16px;
-      border-radius: 8px;
-      border: none;
-      outline: none;
+
+    h1 {
+      font-size: 28px;
+      color: #fff;
+      text-shadow: 0 0 10px red, 0 0 20px red, 0 0 30px red;
+      margin-bottom: 40px;
     }
-    input {
+
+    input[type="text"] {
       width: 80%;
-      margin-bottom: 15px;
+      padding: 12px;
+      border-radius: 12px;
+      border: 2px solid red;
+      background-color: #000;
+      color: #fff;
+      font-size: 16px;
+      margin-bottom: 20px;
+      box-shadow: 0 0 8px red;
     }
-    button {
-      background-color: #ff0050;
+
+    .neon-button {
+      padding: 15px 50px;
+      border: 2px solid white;
+      border-radius: 50px;
+      background: #000;
       color: white;
+      font-size: 18px;
       cursor: pointer;
+      box-shadow: 0 0 12px red, 0 0 24px red;
+      transition: 0.3s ease;
     }
+
+    .neon-button:hover {
+      box-shadow: 0 0 16px #ff0000, 0 0 32px #ff0000, 0 0 48px #ff0000;
+    }
+
     #result {
-      margin-top: 20px;
+      margin-top: 30px;
+      word-break: break-word;
+      text-shadow: 0 0 8px red;
     }
-    video {
-      max-width: 100%;
-      margin-top: 20px;
+
+    a {
+      color: #ff4444;
+      text-decoration: underline;
+    }
+
+    a:hover {
+      color: #ff0000;
     }
   </style>
 </head>
 <body>
-  <h1>TikTok Video Downloader</h1>
-  <p>Masukkan link video TikTok di bawah ini:</p>
-  <input type="text" id="tiktokUrl" placeholder="https://www.tiktok.com/@user/video/..." />
-  <br />
-  <button onclick="download()">Download Video</button>
-
+  <h1>SELAMAT DATANG DI 𓆩villain host𓆪 DOWNLOAD</h1>
+  <input type="text" id="tiktokUrl" placeholder="Tempel link TikTok di sini"><br>
+  <button class="neon-button" onclick="downloadVideo()">DOWNLOAD</button>
   <div id="result"></div>
 
   <script>
-    async function download() {
-      const url = document.getElementById("tiktokUrl").value;
-      if (!url.includes("tiktok.com")) {
-        alert("Link tidak valid!");
-        return;
-      }
-
-      const resDiv = document.getElementById("result");
-      resDiv.innerHTML = "Mengambil data...";
+    async function downloadVideo() {
+      const url = document.getElementById('tiktokUrl').value;
+      const result = document.getElementById('result');
+      result.innerHTML = "Memproses...";
 
       try {
-        const api = `https://tikwm.com/api/?url=${encodeURIComponent(url)}`;
-        const res = await fetch(api);
+        const res = await fetch(`https://api.tiklydown.me/api/download?url=${encodeURIComponent(url)}`);
         const data = await res.json();
 
-        if (!data || !data.data || !data.data.play) {
-          resDiv.innerHTML = "Gagal mengambil video.";
-          return;
+        if (data.video) {
+          result.innerHTML = `<p>Link Video:</p><a href="${data.video}" target="_blank">${data.video}</a>`;
+        } else {
+          result.innerHTML = "Gagal mendapatkan link video.";
         }
-
-        const videoUrl = data.data.play;
-
-        resDiv.innerHTML = `
-          <p>Video tanpa watermark:</p>
-          <video src="${videoUrl}" controls></video><br />
-          <a href="${videoUrl}" download><button>Unduh Sekarang</button></a>
-        `;
       } catch (err) {
-        resDiv.innerHTML = "Terjadi kesalahan.";
+        result.innerHTML = "Terjadi kesalahan saat mengambil data.";
       }
     }
   </script>
