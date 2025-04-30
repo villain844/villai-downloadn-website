@@ -1,88 +1,68 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <title>𓆩villain host𓆪 Download</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>𓆩villain host𓆪 Downloader</title>
   <style>
     body {
-      background-color: #000;
-      color: #fff;
-      font-family: monospace;
+      background-color: #1a0000;
+      color: #ff4d4d;
+      font-family: 'Courier New', monospace;
       text-align: center;
-      padding: 50px;
+      padding: 40px;
     }
-    h1 {
-      font-size: 28px;
-      text-shadow: 0 0 10px red, 0 0 20px red;
-      margin-bottom: 40px;
-    }
-    input, select {
-      width: 80%;
+    input, button {
       padding: 12px;
-      border-radius: 10px;
-      border: 1px solid red;
+      margin: 10px;
+      border: 2px solid #ff4d4d;
       background: black;
-      color: white;
-      box-shadow: 0 0 8px red;
-      margin-bottom: 20px;
+      color: #ff4d4d;
+      border-radius: 8px;
+      width: 80%;
     }
-    .btn {
-      padding: 12px 30px;
-      background: black;
-      color: white;
-      border: 2px solid red;
-      border-radius: 25px;
-      font-size: 16px;
+    button {
       cursor: pointer;
-      box-shadow: 0 0 15px red;
+      font-weight: bold;
     }
-    .btn:hover {
-      background: red;
-      color: black;
-    }
-    #result {
-      margin-top: 30px;
+    .glow {
+      border: 2px solid #ff4d4d;
+      box-shadow: 0 0 15px #ff4d4d;
+      padding: 15px;
+      border-radius: 10px;
+      margin-top: 20px;
     }
     a {
-      color: #ff4444;
+      color: #ffcccc;
+      display: block;
+      margin: 10px;
+      text-decoration: underline;
     }
   </style>
 </head>
 <body>
-  <h1>SELAMAT DATANG DI 𓆩villain host𓆪 DOWNLOAD</h1>
-  <input type="text" id="url" placeholder="Tempel link TikTok pendek di sini" />
-  <br>
-  <select id="format">
-    <option value="mp4">Download MP4 (Video)</option>
-    <option value="mp3">Download MP3 (Audio)</option>
-  </select>
-  <br>
-  <button class="btn" onclick="getDownload()">DOWNLOAD</button>
-  <div id="result"></div>
+  <h1>Selamat datang di 𓆩villain host𓆪 download</h1>
+  <input type="text" id="tiktokUrl" placeholder="Tempel link TikTok di sini" />
+  <button onclick="download()">Download</button>
+
+  <div class="glow" id="result"></div>
 
   <script>
-    async function getDownload() {
-      const url = document.getElementById('url').value;
-      const format = document.getElementById('format').value;
+    async function download() {
+      const url = document.getElementById('tiktokUrl').value;
+      if (!url) return alert("Masukkan link terlebih dahulu.");
+
+      const res = await fetch(`/api/tiktok?url=${encodeURIComponent(url)}`);
+      const data = await res.json();
+
       const result = document.getElementById('result');
-      result.innerHTML = 'Memproses...';
-
-      try {
-        const res = await fetch(`/api/tiktok?url=${encodeURIComponent(url)}`);
-        const data = await res.json();
-
-        if (data.error) {
-          result.innerHTML = 'Gagal mengambil data video.';
-          return;
-        }
-
-        if (format === 'mp4') {
-          result.innerHTML = `<p>Video:</p><a href="${data.video}" target="_blank">Download MP4</a>`;
-        } else {
-          result.innerHTML = `<p>Audio:</p><a href="${data.audio}" target="_blank">Download MP3</a>`;
-        }
-      } catch (err) {
-        result.innerHTML = 'Terjadi kesalahan saat mengambil data.';
+      if (data.error) {
+        result.innerHTML = "Gagal mengambil video.";
+      } else {
+        result.innerHTML = `
+          <a href="${data.video}" target="_blank">Download Video (MP4)</a>
+          <a href="${data.audio}" target="_blank">Download Audio (MP3)</a>
+        `;
       }
     }
   </script>
