@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TikTok Downloader - No Watermark</title>
+  <style>
+    body {
+      background-color: #0f0f0f;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 40px;
+    }
+    input, button {
+      padding: 12px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: none;
+      outline: none;
+    }
+    input {
+      width: 80%;
+      margin-bottom: 15px;
+    }
+    button {
+      background-color: #ff0050;
+      color: white;
+      cursor: pointer;
+    }
+    #result {
+      margin-top: 20px;
+    }
+    video {
+      max-width: 100%;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>TikTok Video Downloader</h1>
+  <p>Masukkan link video TikTok di bawah ini:</p>
+  <input type="text" id="tiktokUrl" placeholder="https://www.tiktok.com/@user/video/..." />
+  <br />
+  <button onclick="download()">Download Video</button>
+
+  <div id="result"></div>
+
+  <script>
+    async function download() {
+      const url = document.getElementById("tiktokUrl").value;
+      if (!url.includes("tiktok.com")) {
+        alert("Link tidak valid!");
+        return;
+      }
+
+      const resDiv = document.getElementById("result");
+      resDiv.innerHTML = "Mengambil data...";
+
+      try {
+        const api = `https://tikwm.com/api/?url=${encodeURIComponent(url)}`;
+        const res = await fetch(api);
+        const data = await res.json();
+
+        if (!data || !data.data || !data.data.play) {
+          resDiv.innerHTML = "Gagal mengambil video.";
+          return;
+        }
+
+        const videoUrl = data.data.play;
+
+        resDiv.innerHTML = `
+          <p>Video tanpa watermark:</p>
+          <video src="${videoUrl}" controls></video><br />
+          <a href="${videoUrl}" download><button>Unduh Sekarang</button></a>
+        `;
+      } catch (err) {
+        resDiv.innerHTML = "Terjadi kesalahan.";
+      }
+    }
+  </script>
+</body>
+</html>
