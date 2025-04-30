@@ -1,33 +1,21 @@
-import https from 'https';
-
 export default async function handler(req, res) {
   const { url } = req.query;
-  if (!url) return res.status(400).json({ error: 'No URL provided' });
+  if (!url) return res.status(400).json({ error: "Link kosong." });
 
   try {
-    // Resolve shortlink
-    const resolvedUrl = await new Promise((resolve, reject) => {
-      https.get(url, (response) => {
-        if (response.statusCode >= 300 && response.statusCode < 400 && response.headers.location) {
-          resolve(response.headers.location);
-        } else {
-          resolve(url);
-        }
-      }).on('error', reject);
-    });
+    const base = "https://api.tikmate.app/api/lookup";
+    const encoded = encodeURIComponent(url);
+    const lookup = await fetch(`${base}?url=${encoded}`);
+    const json = await lookup.json();
 
-    const apiRes = await fetch(`https://api.tiklydown.me/download?url=${encodeURIComponent(resolvedUrl)}`);
-    const data = await apiRes.json();
-
-    if (!data || !data.video || !data.music) {
-      return res.status(500).json({ error: 'Invalid API response' });
+    if (!json || !json.token || !json.id) {
+      return res.status(500).json({ error: "Gagal mengambil data." });
     }
 
-    return res.status(200).json({
-      video: data.video.no_watermark,
-      audio: data.music.play_url
-    });
+    const downloadLink = `https://tikmate.app/download/${json.token}/${json.id}.mp4`;
+
+    return res.status(200).json({ video: downloadLink });
   } catch (err) {
-    return res.status(500).json({ error: 'Failed to fetch data' });
+    return res.status(500).json({ error: "Gagal mengambil video." });
   }
 }
