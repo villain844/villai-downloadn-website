@@ -18,7 +18,7 @@
       margin-bottom: 40px;
     }
 
-    input[type="text"] {
+    input[type="text"], select {
       width: 80%;
       padding: 12px;
       border-radius: 10px;
@@ -56,27 +56,46 @@
 </head>
 <body>
   <h1>SELAMAT DATANG DI 𓆩villain host𓆪 DOWNLOAD</h1>
-  <input type="text" id="url" placeholder="Tempel link TikTok di sini" />
+  <input type="text" id="url" placeholder="Tempel link TikTok pendek di sini" />
   <br>
-  <button class="btn" onclick="download()">DOWNLOAD</button>
+  <select id="format">
+    <option value="mp4">Download MP4 (Video)</option>
+    <option value="mp3">Download MP3 (Audio)</option>
+  </select>
+  <br>
+  <button class="btn" onclick="resolveAndDownload()">DOWNLOAD</button>
   <div id="result"></div>
 
   <script>
-    async function download() {
-      const url = document.getElementById('url').value;
+    async function resolveAndDownload() {
+      const inputUrl = document.getElementById('url').value;
+      const format = document.getElementById('format').value;
       const result = document.getElementById('result');
-      result.innerHTML = "Memproses...";
+      result.innerHTML = "Mengekstrak link...";
 
       try {
-        const response = await fetch(`/api/tikmate?url=${encodeURIComponent(url)}`);
-        const data = await response.json();
+        // Step 1: Resolve short TikTok URL
+        const res = await fetch(inputUrl, { method: 'HEAD', redirect: 'follow' });
+        const fullUrl = res.url;
 
-        if (data?.token && data?.id) {
-          const videoUrl = `https://tikmate.app/download/${data.token}/${data.id}.mp4`;
-          result.innerHTML = `<p>Link Video:</p><a href="${videoUrl}" target="_blank">${videoUrl}</a>`;
-        } else {
-          result.innerHTML = "Gagal mendapatkan link video.";
+        // Step 2: Call TiklyDown API
+        result.innerHTML = "Mengambil video...";
+        const apiRes = await fetch(`https://api.tiklydown.me/download?url=${encodeURIComponent(fullUrl)}`);
+        const data = await apiRes.json();
+
+        if (!data || !data.video) {
+          result.innerHTML = "Gagal mendapatkan data video.";
+          return;
         }
+
+        if (format === "mp4" && data.video.no_watermark) {
+          result.innerHTML = `<p>Video:</p><a href="${data.video.no_watermark}" target="_blank">Download MP4 (Tanpa Watermark)</a>`;
+        } else if (format === "mp3" && data.music && data.music.play_url) {
+          result.innerHTML = `<p>Audio:</p><a href="${data.music.play_url}" target="_blank">Download MP3</a>`;
+        } else {
+          result.innerHTML = "Format tidak tersedia untuk video ini.";
+        }
+
       } catch (error) {
         result.innerHTML = "Terjadi kesalahan saat mengambil data.";
       }
