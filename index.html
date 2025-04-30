@@ -1,69 +1,153 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>𓆩villain host𓆪 Downloader</title>
+  <meta charset="UTF-8">
+  <title>𓆩villain host𓆪 - NGL Spammer</title>
   <style>
     body {
-      background-color: #1a0000;
-      color: #ff4d4d;
-      font-family: 'Courier New', monospace;
+      margin: 0;
+      padding: 0;
+      background: url('https://files.catbox.moe/r7x7ab.jpg') no-repeat center center fixed;
+      background-size: cover;
+      font-family: Arial, sans-serif;
+      color: white;
       text-align: center;
-      padding: 40px;
     }
-    input, button {
-      padding: 12px;
-      margin: 10px;
-      border: 2px solid #ff4d4d;
-      background: black;
-      color: #ff4d4d;
-      border-radius: 8px;
-      width: 80%;
+
+    .container {
+      margin-top: 60px;
     }
-    button {
-      cursor: pointer;
-      font-weight: bold;
-    }
-    .glow {
-      border: 2px solid #ff4d4d;
-      box-shadow: 0 0 15px #ff4d4d;
-      padding: 15px;
+
+    input, textarea {
+      background: rgba(255, 255, 255, 0.1);
+      border: 2px solid red;
       border-radius: 10px;
-      margin-top: 20px;
+      padding: 10px;
+      color: white;
+      margin-bottom: 10px;
+      width: 80%;
+      max-width: 400px;
     }
-    a {
-      color: #ffcccc;
-      display: block;
-      margin: 10px;
-      text-decoration: underline;
+
+    button {
+      padding: 10px 20px;
+      border: none;
+      background: red;
+      color: white;
+      font-weight: bold;
+      border-radius: 10px;
+      box-shadow: 0 0 15px red;
+      cursor: pointer;
+    }
+
+    #notif {
+      position: fixed;
+      top: -50px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(255, 0, 0, 0.9);
+      padding: 12px 24px;
+      border-radius: 12px;
+      font-weight: bold;
+      transition: top 0.5s ease;
+      z-index: 999;
+    }
+
+    #log {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 20px;
+      font-size: 14px;
+    }
+
+    .log-entry {
+      background: rgba(255, 255, 255, 0.1);
+      border-left: 4px solid red;
+      padding: 6px 12px;
+      margin: 4px;
+      border-radius: 6px;
+      width: fit-content;
+    }
+
+    strong {
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
-  <h1>Selamat datang di 𓆩villain host𓆪 download</h1>
-  <input type="text" id="tiktokUrl" placeholder="Tempel link TikTok di sini" />
-  <button onclick="download()">Download</button>
+  <div id="notif"></div>
+  <div class="container">
+    <h1>𓆩villain host𓆪 - NGL Spammer</h1>
+    <input id="username" placeholder="username ngl tanpa @" /><br>
+    <textarea id="message" placeholder="pesan yang ingin dikirim"></textarea><br>
+    <input id="jumlah" type="number" placeholder="jumlah pesan" /><br>
+    <input id="delay" type="number" placeholder="delay (1-60 dtk)" /><br>
+    <button onclick="kirim()">Mulai Spam</button>
 
-  <div class="glow" id="result"></div>
+    <div id="log"></div>
+  </div>
 
   <script>
-    async function download() {
-      const url = document.getElementById('tiktokUrl').value;
-      if (!url) return alert("Masukkan link terlebih dahulu.");
+    function showNotif(text) {
+      const notif = document.getElementById('notif');
+      notif.textContent = text;
+      notif.style.top = '30px';
 
-      const res = await fetch(`/api/tiktok?url=${encodeURIComponent(url)}`);
-      const data = await res.json();
+      setTimeout(() => {
+        notif.style.top = '-50px';
+      }, 1600);
+    }
 
-      const result = document.getElementById('result');
-      if (data.error) {
-        result.innerHTML = "Gagal mengambil video.";
-      } else {
-        result.innerHTML = `
-          <a href="${data.video}" target="_blank">Download Video (MP4)</a>
-          <a href="${data.audio}" target="_blank">Download Audio (MP3)</a>
-        `;
+    async function kirim() {
+      const user = document.getElementById('username').value.trim();
+      const pesan = document.getElementById('message').value.trim();
+      const jumlah = parseInt(document.getElementById('jumlah').value);
+      const delay = parseInt(document.getElementById('delay').value * 1000);
+      const log = document.getElementById('log');
+      log.innerHTML = '';
+
+      if (!user || !pesan || isNaN(jumlah) || isNaN(delay)) {
+        showNotif("Lengkapi semua data!");
+        return;
       }
+
+      showNotif("Spam dimulai");
+
+      for (let i = 1; i <= jumlah; i++) {
+        try {
+          const res = await fetch('/api/send', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username: user, message: pesan })
+          });
+
+          if (res.ok) {
+            const div = document.createElement('div');
+            div.className = 'log-entry';
+            div.textContent = `pesan ke ${i} berhasil terkirim by villain`;
+            log.appendChild(div);
+          } else {
+            const div = document.createElement('div');
+            div.className = 'log-entry';
+            div.textContent = `pesan ke ${i} gagal terkirim`;
+            log.appendChild(div);
+          }
+        } catch {
+          const div = document.createElement('div');
+          div.className = 'log-entry';
+          div.textContent = `pesan ke ${i} error`;
+          log.appendChild(div);
+        }
+
+        await new Promise(resolve => setTimeout(resolve, delay));
+      }
+
+      showNotif("SPAM SELESAI");
+      const done = document.createElement('div');
+      done.className = 'log-entry';
+      done.innerHTML = `<strong>done yang ke ${jumlah} sudah berhasil terkirim ya 😋</strong>`;
+      log.appendChild(done);
     }
   </script>
 </body>
