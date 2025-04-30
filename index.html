@@ -7,84 +7,84 @@
     body {
       background-color: #000;
       color: #fff;
-      font-family: 'Courier New', monospace;
+      font-family: monospace;
       text-align: center;
       padding: 50px;
     }
 
     h1 {
       font-size: 28px;
-      color: #fff;
-      text-shadow: 0 0 10px red, 0 0 20px red, 0 0 30px red;
+      text-shadow: 0 0 10px red, 0 0 20px red;
       margin-bottom: 40px;
     }
 
     input[type="text"] {
       width: 80%;
       padding: 12px;
-      border-radius: 12px;
-      border: 2px solid red;
-      background-color: #000;
-      color: #fff;
-      font-size: 16px;
-      margin-bottom: 20px;
-      box-shadow: 0 0 8px red;
-    }
-
-    .neon-button {
-      padding: 15px 50px;
-      border: 2px solid white;
-      border-radius: 50px;
-      background: #000;
+      border-radius: 10px;
+      border: 1px solid red;
+      background: black;
       color: white;
-      font-size: 18px;
-      cursor: pointer;
-      box-shadow: 0 0 12px red, 0 0 24px red;
-      transition: 0.3s ease;
+      box-shadow: 0 0 8px red;
+      margin-bottom: 20px;
     }
 
-    .neon-button:hover {
-      box-shadow: 0 0 16px #ff0000, 0 0 32px #ff0000, 0 0 48px #ff0000;
+    .btn {
+      padding: 12px 30px;
+      background: black;
+      color: white;
+      border: 2px solid red;
+      border-radius: 25px;
+      font-size: 16px;
+      cursor: pointer;
+      box-shadow: 0 0 15px red;
+    }
+
+    .btn:hover {
+      background: red;
+      color: black;
     }
 
     #result {
       margin-top: 30px;
-      word-break: break-word;
-      text-shadow: 0 0 8px red;
     }
 
     a {
       color: #ff4444;
-      text-decoration: underline;
-    }
-
-    a:hover {
-      color: #ff0000;
     }
   </style>
 </head>
 <body>
   <h1>SELAMAT DATANG DI 𓆩villain host𓆪 DOWNLOAD</h1>
-  <input type="text" id="tiktokUrl" placeholder="Tempel link TikTok di sini"><br>
-  <button class="neon-button" onclick="downloadVideo()">DOWNLOAD</button>
+  <input type="text" id="url" placeholder="Tempel link TikTok di sini" />
+  <br>
+  <button class="btn" onclick="download()">DOWNLOAD</button>
   <div id="result"></div>
 
   <script>
-    async function downloadVideo() {
-      const url = document.getElementById('tiktokUrl').value;
+    async function download() {
+      const url = document.getElementById('url').value;
       const result = document.getElementById('result');
       result.innerHTML = "Memproses...";
 
       try {
-        const res = await fetch(`https://api.tiklydown.me/api/download?url=${encodeURIComponent(url)}`);
-        const data = await res.json();
+        const response = await fetch(`https://tiktok-video-no-watermark2.p.rapidapi.com/?url=${encodeURIComponent(url)}`, {
+          method: 'GET',
+          headers: {
+            'X-RapidAPI-Key': '59ac0efd07mshb08c46b47c831e9p1b39b3jsn8b709962d3b0',
+            'X-RapidAPI-Host': 'tiktok-video-no-watermark2.p.rapidapi.com'
+          }
+        });
 
-        if (data.video) {
-          result.innerHTML = `<p>Link Video:</p><a href="${data.video}" target="_blank">${data.video}</a>`;
+        const data = await response.json();
+
+        if (data?.data?.play) {
+          result.innerHTML = `<p>Link Video:</p><a href="${data.data.play}" target="_blank">${data.data.play}</a>`;
         } else {
           result.innerHTML = "Gagal mendapatkan link video.";
         }
-      } catch (err) {
+
+      } catch (error) {
         result.innerHTML = "Terjadi kesalahan saat mengambil data.";
       }
     }
